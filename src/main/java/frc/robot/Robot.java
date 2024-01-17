@@ -1,247 +1,162 @@
-// package frc.robot;
-// import edu.wpi.first.wpilibj.Timer;
-// import com.ctre.phoenix.motorcontrol.*;
-// import com.ctre.phoenix.motorcontrol.can.*;
-
-// import edu.wpi.first.wpilibj.Joystick;
-// import edu.wpi.first.wpilibj.TimedRobot;
-
-// public class Robot extends TimedRobot {
-//     // Motor controllers
-//     TalonSRX _talon0 = new TalonSRX(1);
-//     TalonSRX _talon1 = new TalonSRX(3);
-//     TalonSRX _talon2 = new TalonSRX(5);
-//     TalonSRX _talon3 = new TalonSRX(2);
-//     TalonSRX _talon4 = new TalonSRX(4);
-//     TalonSRX _talon5 = new TalonSRX(6);
-
-//     // Joystick (for teleop)
-//     Joystick _joystick = new Joystick(0);
-
-//     // Autonomous variables
-//     private Timer autoTimer = new Timer();
-//     private final double AUTO_TIME = 15.0; // Autonomous period in seconds
-//     private final double TARGET_DISTANCE = 5.0; // Target distance in feet
-//     private boolean reachedTarget = false;
-
-//     @Override
-//     public void robotInit() {
-//         // Robot initialization code here (if any)
-//     }
-
-//     @Override
-//     public void autonomousInit() {
-//         // Reset and start the autonomous timer
-//         autoTimer.reset();
-//         autoTimer.start();
-//         reachedTarget = false;
-
-//         // Initial motor configuration for autonomous
-//         // (Adjust as necessary for your robot's setup)
-//         _talon0.setInverted(false);
-//         _talon3.setInverted(true);
-//         // Other motor initializations (if necessary)
-//     }
-
-//     @Override
-//     public void autonomousPeriodic() {
-//         // Check if the autonomous period is still active and the target hasn't been reached
-//         if (autoTimer.get() < AUTO_TIME && !reachedTarget) {
-//             // Example: drive straight at a certain speed
-//             double speed = 0.5; // Adjust this value based on your robot
-
-//             // Set motor speeds
-//             _talon0.set(ControlMode.PercentOutput, speed);
-//             _talon1.set(ControlMode.PercentOutput, speed);
-//             _talon2.set(ControlMode.PercentOutput, speed);
-//             _talon3.set(ControlMode.PercentOutput, speed);
-//             _talon4.set(ControlMode.PercentOutput, speed);
-//             _talon5.set(ControlMode.PercentOutput, speed);
-
-//             // Limelight-based adjustments or distance checks can be added here
-//             // Check if the robot has reached the target distance (5 feet)
-//             // This is where you need to integrate your distance measuring logic
-
-//             // If the target distance is reached, set reachedTarget to true
-//             // reachedTarget = checkIfTargetReached(); // Implement this method or logic
-//         } else {
-//             // Stop the robot
-//             stopMotors();
-//         }
-//     }
-
-//     @Override
-//     public void teleopInit() {
-//         // Teleop initialization code here (if any)
-//     }
-
-//     @Override
-//     public void teleopPeriodic() {
-//         // Your existing teleop code
-//         double speed = _joystick.getRawAxis(1) * 0.3;
-//         double turn = _joystick.getRawAxis(4) * 0.3;
-
-//         double left = speed + turn;
-//         double right = speed - turn;
-
-//         _talon0.set(ControlMode.PercentOutput, left);
-//         _talon1.set(ControlMode.PercentOutput, left);
-//         _talon2.set(ControlMode.PercentOutput, left);
-//         _talon3.set(ControlMode.PercentOutput, -right);
-//         _talon4.set(ControlMode.PercentOutput, -right);
-//         _talon5.set(ControlMode.PercentOutput, -right);
-//     }
-
-//     // Utility method to stop all motors
-//     private void stopMotors() {
-//         _talon0.set(ControlMode.PercentOutput, 0);
-//         _talon1.set(ControlMode.PercentOutput, 0);
-//         _talon2.set(ControlMode.PercentOutput, 0);
-//         _talon3.set(ControlMode.PercentOutput, 0);
-//         _talon4.set(ControlMode.PercentOutput, 0);
-//         _talon5.set(ControlMode.PercentOutput, 0);
-//     }
-// }
-
-
-
-
 package frc.robot;
-import edu.wpi.first.wpilibj.Timer;
-import com.ctre.phoenix.motorcontrol.*;
-import com.ctre.phoenix.motorcontrol.can.*;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.*;
+import edu.wpi.first.networktables.*;
 
+/**
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to each mode, as described in the TimedRobot
+ * documentation. If you change the name of this class or the package after
+ * creating this project, you must also update the build.gradle file in the
+ * project.
+ */
+private static final String kDefaultAuto = "Default";
+  private static final String kCustomAuto = "My Auto";
+  private String m_autoSelected;
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
+  private TalonSRX m_Left0 = new TalonSRX(1); // Updated motor number
+  private TalonSRX m_Left1 = new TalonSRX(3); // Updated motor number
+  private TalonSRX m_Left2 = new TalonSRX(5); // Updated motor number
+  private TalonSRX m_Right0 = new TalonSRX(2); // Updated motor number
+  private TalonSRX m_Right1 = new TalonSRX(4); // Updated motor number
+  private TalonSRX m_Right2 = new TalonSRX(6); // Updated motor number
+  private SpeedControllerGroup m_LeftMotors = new SpeedControllerGroup(m_Left0, m_Left1, m_Left2);
+  private SpeedControllerGroup m_RightMotors = new SpeedControllerGroup(m_Right0, m_Right1, m_Right2);
+  private DifferentialDrive m_Drive = new DifferentialDrive(m_LeftMotors, m_RightMotors);
 
-public class Robot extends TimedRobot {
-    // Motor controllers
-    TalonSRX _talon0 = new TalonSRX(1);
-    TalonSRX _talon1 = new TalonSRX(3);
-    TalonSRX _talon2 = new TalonSRX(5);
-    TalonSRX _talon3 = new TalonSRX(2);
-    TalonSRX _talon4 = new TalonSRX(4);
-    TalonSRX _talon5 = new TalonSRX(6);
+  private XboxController m_Controller = new XboxController(0);
 
-    // Joystick (for teleop)
-    Joystick _joystick = new Joystick(0);
+  private boolean m_LimelightHasValidTarget = false;
+  private double m_LimelightDriveCommand = 0.0;
+  private double m_LimelightSteerCommand = 0.0;
 
-    // Limelight variables
-    private NetworkTable table;
-    private NetworkTableEntry tx, ty, ta;
-    private boolean m_LimelightHasValidTarget;
-    private double m_LimelightDriveCommand;
-    private double m_LimelightSteerCommand;
+  /**
+   * This function is run when the robot is first started up and should be
+   * used for any initialization code.
+   */
+  @Override
+  public void robotInit() {
+        m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
+        m_chooser.addOption("My Auto", kCustomAuto);
+        SmartDashboard.putData("Auto choices", m_chooser);
+  }
 
-    // Distance tracking variables
-    private boolean reachedTarget = false;
-    private final double TARGET_DISTANCE = 2.0; // Target distance in feet
+  /**
+   * This function is called every robot packet, no matter the mode. Use
+   * this for items like diagnostics that you want ran during disabled,
+   * autonomous, teleoperated and test.
+   *
+   * <p>This runs after the mode specific periodic functions, but before
+   * LiveWindow and SmartDashboard integrated updating.
+   */
+  @Override
+  public void robotPeriodic() {
+  }
 
-    @Override
-    public void robotInit() {
-        // Initialize NetworkTable for Limelight
-        table = NetworkTableInstance.getDefault().getTable("limelight");
-        tx = table.getEntry("tx");
-        ty = table.getEntry("ty");
-        ta = table.getEntry("ta");
+  /**
+   * This autonomous (along with the chooser code above) shows how to select
+   * between different autonomous modes using the dashboard. The sendable
+   * chooser code works with the Java SmartDashboard. If you prefer the
+   * LabVIEW Dashboard, remove all of the chooser code and uncomment the
+   * getString line to get the auto name from the text box below the Gyro
+   *
+   * <p>You can add additional auto modes by adding additional comparisons to
+   * the switch structure below with additional strings. If using the
+   * SendableChooser make sure to add them to the chooser code above as well.
+   */
+  @Override
+  public void autonomousInit() {
+        m_autoSelected = m_chooser.getSelected();
+  }
 
-        // Initialize your distance sensor here (if any)
-    }
+  /**
+   * This function is called periodically during autonomous.
+   */
+  @Override
+  public void autonomousPeriodic() {
+  }
 
-    @Override
-    public void autonomousInit() {
-        // Autonomous initialization
-        reachedTarget = false;
-        // Reset your distance sensor here (if any)
-    }
+  /**
+   * This function is called periodically during operator control.
+   */
+  @Override
+  public void teleopPeriodic() {
 
-    @Override
-    public void autonomousPeriodic() {
-        // Autonomous mode logic (to be implemented)
-    }
+        Update_Limelight_Tracking();
 
-    @Override
-    public void teleopInit() {
-        // Teleop initialization
-        reachedTarget = false;
-        // Reset your distance sensor here (if any)
-    }
+        double steer = m_Controller.getX(Hand.kRight);
+        double drive = -m_Controller.getY(Hand.kLeft);
+        boolean auto = m_Controller.getAButton();
 
-    @Override
-    public void teleopPeriodic() {
-        if (!reachedTarget) {
-            Update_Limelight_Tracking();
-            reachedTarget = checkIfTargetReached(); // Checks if the target distance is reached
-        } else {
-            stopMotors();  // Stops the robot
+        steer *= 0.70;
+        drive *= 0.70;
+
+        if (auto)
+        {
+          if (m_LimelightHasValidTarget)
+          {
+                m_Drive.arcadeDrive(m_LimelightDriveCommand,m_LimelightSteerCommand);
+          }
+          else
+          {
+                m_Drive.arcadeDrive(0.0,0.0);
+          }
         }
-    }
+        else
+        {
+          m_Drive.arcadeDrive(drive,steer);
+        }
+  }
 
-    // Utility method to stop all motors
-    private void stopMotors() {
-        _talon0.set(ControlMode.PercentOutput, 0);
-        _talon1.set(ControlMode.PercentOutput, 0);
-        _talon2.set(ControlMode.PercentOutput, 0);
-        _talon3.set(ControlMode.PercentOutput, 0);
-        _talon4.set(ControlMode.PercentOutput, 0);
-        _talon5.set(ControlMode.PercentOutput, 0);
-    }
+  @Override
+  public void testPeriodic() {
+  }
 
-    // Limelight tracking method
-    private void Update_Limelight_Tracking() {
-        final double STEER_K = 0.03;  // Proportional steering constant
-        final double DRIVE_K = 0.26;  // Proportional driving constant
-        final double DESIRED_TARGET_AREA = 13.0;  // Area of the target at 2 feet
-        final double MAX_DRIVE = 0.7;  // Maximum drive speed
-2
-        double tv = tx.getDouble(0.0);
-        double txVal = tx.getDouble(0.0);
-        double taVal = ta.getDouble(0.0);
+  /**
+   * This function implements a simple method of generating driving and steering commands
+   * based on the tracking data from a limelight camera.
+   */
+  public void Update_Limelight_Tracking()
+  {
+        // These numbers must be tuned for your Robot!  Be careful!
+        final double STEER_K = 0.03;                    // how hard to turn toward the target
+        final double DRIVE_K = 0.26;                    // how hard to drive fwd toward the target
+        final double DESIRED_TARGET_AREA = 13.0;        // Area of the target when the robot reaches the wall
+        final double MAX_DRIVE = 0.7;                   // Simple speed limit so we don't drive too fast
 
-        if (tv < 1.0) {
-            m_LimelightHasValidTarget = false;
-            m_LimelightDriveCommand = 0.0;
-            m_LimelightSteerCommand = 0.0;
-            return;
+        double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
+        double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+        double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+        double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+
+        if (tv < 1.0)
+        {
+          m_LimelightHasValidTarget = false;
+          m_LimelightDriveCommand = 0.0;
+          m_LimelightSteerCommand = 0.0;
+          return;
         }
 
         m_LimelightHasValidTarget = true;
 
-        double steer_cmd = txVal * STEER_K;
+        // Start with proportional steering
+        double steer_cmd = tx * STEER_K;
         m_LimelightSteerCommand = steer_cmd;
 
-        double drive_cmd = (DESIRED_TARGET_AREA - taVal) * DRIVE_K;
-        if (drive_cmd > MAX_DRIVE) {
-            drive_cmd = MAX_DRIVE;
+        // try to drive forward until the target area reaches our desired area
+        double drive_cmd = (DESIRED_TARGET_AREA - ta) * DRIVE_K;
+
+        // don't let the robot drive too fast into the goal
+        if (drive_cmd > MAX_DRIVE)
+        {
+          drive_cmd = MAX_DRIVE;
         }
         m_LimelightDriveCommand = drive_cmd;
-
-        // Apply the calculated values to the motors
-        _talon0.set(ControlMode.PercentOutput, m_LimelightDriveCommand + m_LimelightSteerCommand);
-        _talon1.set(ControlMode.PercentOutput, m_LimelightDriveCommand + m_LimelightSteerCommand);
-        _talon2.set(ControlMode.PercentOutput, m_LimelightDriveCommand + m_LimelightSteerCommand);
-        _talon3.set(ControlMode.PercentOutput, -m_LimelightDriveCommand + m_LimelightSteerCommand);
-        _talon4.set(ControlMode.PercentOutput, -m_LimelightDriveCommand + m_LimelightSteerCommand);
-        _talon5.set(ControlMode.PercentOutput, -m_LimelightDriveCommand + m_LimelightSteerCommand);
-    }
-
-    // Method to check if the target distance is reached
-    private boolean checkIfTargetReached() {
-        // Implement the logic to check if the robot has moved 2 feet
-        // Assuming you have a method to get the distance traveled
-        // return getDistanceTraveled() >= TARGET_DISTANCE;
-        return false; // Replace this with actual distance checking
-    }
-
-    // Example method to get the distance traveled (using an encoder, for instance)
-    private double getDistanceTraveled() {
-    
-        return 0; // Replace this with actual distance measurement
-    }
+  }
 }
-
