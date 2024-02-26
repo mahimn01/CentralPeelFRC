@@ -48,8 +48,6 @@ public class LimeLight extends SubsystemBase {
         SmartDashboard.putNumber("LimeLight TA", ta);
         SmartDashboard.putBoolean("Target Aquired", m_ValidTarget);
 
-
-        //post estimated field postion to smart dashboard
         Pose2d robotPose = LimelightHelpers.getBotPose2d("limelight");
         // Update Smart Dashboard with robot position
         SmartDashboard.putNumber("Robot X", robotPose.getX());
