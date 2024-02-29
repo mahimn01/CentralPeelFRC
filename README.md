@@ -5,6 +5,7 @@ https://github.com/cavineers/RobotCode2022/blob/development/src/main/java/frc/ro
 
 https://www.chiefdelphi.com/t/looking-for-how-to-start-with-limelight-java/361736/2
 
+https://github.com/Robojacks/FRC-2019-Rampage/blob/master/src/main/java/frc/robot/VisionProcessing/LimelightSubsystem.java
 
 https://readthedocs.org/projects/limelight/downloads/pdf/latest/
 
