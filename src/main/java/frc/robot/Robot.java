@@ -226,8 +226,8 @@ public class Robot extends TimedRobot {
     public void teleopPeriodic() {
         Update_Limelight_Tracking();
 
-        double steer = m_Controller.getRawAxis(1) * 0.3;
-        double drive = m_Controller.getRawAxis(4) * 0.3;
+        double steer = m_Controller.getRawAxis(4) * 0.3;
+        double drive = m_Controller.getRawAxis(1) * 0.3;
         boolean auto = m_Controller.getAButton();
 
         steer *= 0.70;
@@ -237,9 +237,13 @@ public class Robot extends TimedRobot {
         {
             if (m_LimelightHasValidTarget)
             {
-                    m_Drive.arcadeDrive(m_LimelightDriveCommand,m_LimelightSteerCommand);
-                    _leftMotors.set(m_LimelightDriveCommand);
-                    _rightMotors.set(m_LimelightSteerCommand);
+                    // m_Drive.arcadeDrive(m_LimelightDriveCommand,m_LimelightSteerCommand);
+
+                    double left = m_LimelightDriveCommand + m_LimelightSteerCommand;
+                    double right = m_LimelightDriveCommand - m_LimelightSteerCommand;
+
+                    _leftMotors.set(left);
+                    _rightMotors.set(right);
             }
             else
             {
