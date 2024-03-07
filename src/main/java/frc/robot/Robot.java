@@ -227,7 +227,7 @@ public class Robot extends TimedRobot {
         Update_Limelight_Tracking();
 
         double steer = m_Controller.getRawAxis(1) * 0.3;
-        double drive = -m_Controller.getRawAxis(4) * 0.3;
+        double drive = m_Controller.getRawAxis(4) * 0.3;
         boolean auto = m_Controller.getAButton();
 
         steer *= 0.70;
@@ -238,10 +238,14 @@ public class Robot extends TimedRobot {
             if (m_LimelightHasValidTarget)
             {
                     m_Drive.arcadeDrive(m_LimelightDriveCommand,m_LimelightSteerCommand);
+                    _leftMotors.set(m_LimelightDriveCommand);
+                    _rightMotors.set(m_LimelightSteerCommand);
             }
             else
             {
-                    m_Drive.arcadeDrive(0.0,0.0);
+                    // m_Drive.arcadeDrive(0.0,0.0);
+                    _leftMotors.set(0);
+                    _rightMotors.set(0);
             }
         }
         else
