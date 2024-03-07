@@ -50,9 +50,9 @@ public class Robot extends TimedRobot {
 
         @Override
         public void setInverted(boolean isInverted) {
-            _talon0.setInverted(isInverted);
-            _talon1.setInverted(isInverted);
-            _talon2.setInverted(isInverted);
+            _talon0.setInverted(false);
+            _talon1.setInverted(false);
+            _talon2.setInverted(false);
         }
 
         @Override
@@ -87,9 +87,9 @@ public class Robot extends TimedRobot {
 
         @Override
         public void setInverted(boolean isInverted) {
-            _talon3.setInverted(isInverted);
-            _talon4.setInverted(isInverted);
-            _talon5.setInverted(isInverted);
+            _talon3.setInverted(true);
+            _talon4.setInverted(true);
+            _talon5.setInverted(true);
         }
 
         @Override
