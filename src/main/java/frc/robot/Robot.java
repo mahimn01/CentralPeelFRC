@@ -246,7 +246,11 @@ public class Robot extends TimedRobot {
         }
         else
         {
-        m_Drive.arcadeDrive(drive,steer);
+            double left = drive + steer;
+            double right = drive - steer;
+            
+            _leftMotors.set(left);
+            _rightMotors.set(-right);
         }
     }
 
