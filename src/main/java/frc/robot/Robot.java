@@ -243,7 +243,7 @@ public class Robot extends TimedRobot {
                     double right = m_LimelightDriveCommand - m_LimelightSteerCommand;
 
                     _leftMotors.set(left);
-                    _rightMotors.set(right);
+                    _rightMotors.set(-right);
             }
             else
             {
