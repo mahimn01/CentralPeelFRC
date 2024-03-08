@@ -230,15 +230,10 @@ public class Robot extends TimedRobot {
         double drive = m_Controller.getRawAxis(1) * 0.3;
         boolean auto = m_Controller.getAButton();
 
-        steer *= 0.70;
-        drive *= 0.70;
-
         if (auto)
         {
             if (m_LimelightHasValidTarget)
             {
-                    // m_Drive.arcadeDrive(m_LimelightDriveCommand,m_LimelightSteerCommand);
-
                     double left = m_LimelightDriveCommand + m_LimelightSteerCommand;
                     double right = m_LimelightDriveCommand - m_LimelightSteerCommand;
 
@@ -247,7 +242,6 @@ public class Robot extends TimedRobot {
             }
             else
             {
-                    // m_Drive.arcadeDrive(0.0,0.0);
                     _leftMotors.set(0);
                     _rightMotors.set(0);
             }
@@ -264,7 +258,6 @@ public class Robot extends TimedRobot {
 
     public void Update_Limelight_Tracking()
     {
-        // These numbers must be tuned for your Robot!  Be careful!
         final double STEER_K = 0.03;                    // how hard to turn toward the target
         final double DRIVE_K = 0.26;                    // how hard to drive fwd toward the target
         final double DESIRED_TARGET_AREA = 13.0;        // Area of the target when the robot reaches the wall
